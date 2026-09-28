@@ -96,6 +96,14 @@ def strip_ignore_pkg(line: str, drop: set[str]) -> str | None:
     return "IgnorePkg = " + " ".join(packages)
 
 
+def guest_holds(guest_config: Path) -> set[str]:
+    holds: set[str] = set()
+    for line in guest_config.read_text().splitlines():
+        if line.startswith("IgnorePkg"):
+            holds.update(line.partition("=")[2].split())
+    return holds
+
+
 def write_builder_config(
     *,
     guest_config: Path,
@@ -215,7 +223,10 @@ def main() -> None:
         disable_sandbox=args.disable_sandbox,
         abi_repo=abi_repo if pins else None,
         pinned_cache_repo=args.pinned_cache_repo,
-        drop_ignore={pin["name"] for pin in pins},
+        # Holds protect the installed guest from partial upgrades. The builder
+        # installs one fixed transaction, and pacman never pulls an ignored
+        # package in as a dependency, so none of them apply here.
+        drop_ignore=guest_holds(args.guest_config),
         repository_mirrors=repository_mirrors,
     )
 

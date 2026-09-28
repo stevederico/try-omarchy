@@ -237,16 +237,7 @@
       "https://ca.us.mirror.archlinuxarm.org/aarch64",
       "https://de3.mirror.archlinuxarm.org/aarch64"
     ],
-    "abiPackagePins": [
-      {
-        "name": "aquamarine",
-        "version": "0.15.1-1"
-      },
-      {
-        "name": "hyprtoolkit",
-        "version": "0.5.4-6.2"
-      }
-    ]
+    "abiPackagePins": []
   },
   "authenticity": {
     "verbatimRuntimeTrees": [

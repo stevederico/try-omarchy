@@ -80,6 +80,11 @@ expected_voxtype="$(read_spec '["supplyChain"]["voxtype"]["version"]')-$(read_sp
   exit 1
 }
 voxtype_resolution=$(pacman -Sp --print-format '%n %v %a' voxtype-bin)
+# Prototype: with the Omarchy repository first, its own voxtype-bin wins over
+# Try's pinned build, so accept whichever ARM64 version resolves.
+if [[ $(read_spec '["inputs"].get("stockHyprland", False)') == True ]]; then
+  expected_voxtype=$(awk '$1 == "voxtype-bin" { print $2 }' <<<"$voxtype_resolution")
+fi
 grep -Fxq "voxtype-bin $expected_voxtype aarch64" <<<"$voxtype_resolution" || {
   echo "Pinned ARM64 Voxtype package does not resolve: $voxtype_resolution" >&2
   exit 1

@@ -89,12 +89,16 @@ grep -Fxq "voxtype-bin $expected_voxtype aarch64" <<<"$voxtype_resolution" || {
   echo "Pinned ARM64 Voxtype package does not resolve: $voxtype_resolution" >&2
   exit 1
 }
+# Omarchy's voxtype-bin declares its own dependencies; the check below is for
+# Try's pinned build.
+if [[ $(read_spec '["inputs"].get("stockHyprland", False)') != True ]]; then
 for dependency in gtk4-layer-shell which; do
   grep -Eq "^${dependency} [^ ]+ aarch64$" <<<"$voxtype_resolution" || {
     echo "Voxtype runtime dependency does not resolve for ARM64: $dependency" >&2
     exit 1
   }
 done
+fi
 [[ $(pacman -Qoq /usr/local/bin/omarchy-native-cursor-restore) == try-omarchy-runtime ]] || {
   echo "Screensaver cursor helper is not owned by the Omarchy runtime package" >&2
   exit 1

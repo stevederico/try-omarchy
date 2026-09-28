@@ -62,6 +62,7 @@ expected_mise=$(read_spec '["supplyChain"]["mise"]["reportedVersion"]')
 expected_ttfx=$(read_spec '["supplyChain"]["ttfx"]["reportedVersion"]')
 [[ -x /usr/bin/ttfx ]] || { echo "Missing pinned ARM64 ttfx" >&2; exit 1; }
 [[ $(/usr/bin/ttfx --version) == "$expected_ttfx" ]] || { echo "Pinned ttfx identity mismatch" >&2; exit 1; }
+if [[ $(read_spec '["inputs"].get("stockHyprland", False)') != True ]]; then
 expected_hyprland="$(read_spec '["supplyChain"]["hyprland"]["version"]')-$(read_spec '["supplyChain"]["hyprland"]["pkgrel"]')"
 [[ $(pacman -Q hyprland) == "hyprland $expected_hyprland" ]] || {
   echo "Rounded-border Hyprland backport is missing" >&2
@@ -72,6 +73,7 @@ printf '%s  %s\n' "$expected_hyprland_sha256" /usr/bin/Hyprland | sha256sum -c -
   echo "Rounded-border Hyprland binary digest mismatch" >&2
   exit 1
 }
+fi
 expected_voxtype="$(read_spec '["supplyChain"]["voxtype"]["version"]')-$(read_spec '["supplyChain"]["voxtype"]["pkgrel"]')"
 [[ ! $(pacman -Qq voxtype-bin 2>/dev/null || true) ]] || {
   echo "Opt-in Voxtype must not be installed in the factory image" >&2

@@ -237,7 +237,8 @@
       "https://ca.us.mirror.archlinuxarm.org/aarch64",
       "https://de3.mirror.archlinuxarm.org/aarch64"
     ],
-    "abiPackagePins": []
+    "abiPackagePins": [],
+    "stockHyprland": true
   },
   "authenticity": {
     "verbatimRuntimeTrees": [

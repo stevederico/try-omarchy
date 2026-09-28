@@ -60,7 +60,7 @@ spec = json.loads(pathlib.Path(sys.argv[1]).read_text())
 print(spec["image"]["sourceDateEpoch"])
 print(spec.get("guest", {}).get("profile"))
 hyprland = spec["supplyChain"]["hyprland"]
-print(f'{hyprland["version"]}-{hyprland["pkgrel"]}')
+print("stock" if spec["inputs"].get("stockHyprland") else f'{hyprland["version"]}-{hyprland["pkgrel"]}')
 voxtype = spec["supplyChain"]["voxtype"]
 print(f'{voxtype["version"]}-{voxtype["pkgrel"]}')
 battery = spec["supplyChain"]["tryOmarchyBattery"]
@@ -75,7 +75,7 @@ expected_voxtype_version=${metadata[3]}
 expected_battery_version=${metadata[4]}
 [[ $source_date_epoch =~ ^[0-9]+$ ]] || fail "invalid source date epoch"
 [[ $profile == factory ]] || fail "native guest profile must be factory"
-[[ $expected_hyprland_version =~ ^[0-9]+\.[0-9]+\.[0-9]+-[0-9.]+$ ]] ||
+[[ $expected_hyprland_version == stock || $expected_hyprland_version =~ ^[0-9]+\.[0-9]+\.[0-9]+-[0-9.]+$ ]] ||
   fail "invalid patched Hyprland package version"
 [[ $expected_voxtype_version =~ ^[0-9]+\.[0-9]+\.[0-9]+-[1-9][0-9]*$ ]] ||
   fail "invalid Voxtype package version"
@@ -89,13 +89,14 @@ shopt -s nullglob
 archives=("$repo_dir"/*.pkg.tar.zst)
 shopt -u nullglob
 expected_archive_count=7
+[[ $expected_hyprland_version == stock ]] && expected_archive_count=6
 (( ${#archives[@]} == expected_archive_count )) ||
   fail "local repository expected $expected_archive_count package archive(s), found ${#archives[@]}"
 [[ ${archives[*]} == *'/try-omarchy-runtime-'* ]] || fail "local repository is missing the Omarchy runtime"
 [[ ${archives[*]} == *'/try-omarchy-mise-'* ]] || fail "factory repository is missing pinned mise"
 [[ ${archives[*]} == *'/try-omarchy-ttfx-'* ]] || fail "factory repository is missing pinned ttfx"
 [[ ${archives[*]} == *'/try-omarchy-yay-'* ]] || fail "factory repository is missing pinned yay"
-[[ ${archives[*]} == *"/hyprland-$expected_hyprland_version-aarch64.pkg.tar.zst"* ]] ||
+[[ $expected_hyprland_version == stock || ${archives[*]} == *"/hyprland-$expected_hyprland_version-aarch64.pkg.tar.zst"* ]] ||
   fail "factory repository is missing patched Hyprland"
 [[ ${archives[*]} == *"/voxtype-bin-$expected_voxtype_version-aarch64.pkg.tar.zst"* ]] ||
   fail "factory repository is missing pinned Voxtype"

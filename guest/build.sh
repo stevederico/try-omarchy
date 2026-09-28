@@ -292,11 +292,15 @@ python3 "$guest_dir/scripts/apply-omarchy-backports.py" --root "$root" --spec "$
   --work "$work" \
   --spec "$spec" \
   --pacman-config "$pacman_config"
+# Prototype: inputs.stockHyprland keeps the Hyprland package from the
+# Omarchy repository instead of rebuilding the rounded-border backport.
+if [[ $(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["inputs"].get("stockHyprland", False))' "$spec") != True ]]; then
 "$guest_dir/scripts/register-patched-hyprland.sh" \
   --root "$root" \
   --work "$work" \
   --spec "$spec" \
   --pacman-config "$pacman_config"
+fi
 "$guest_dir/scripts/register-pinned-voxtype.sh" \
   --root "$root" \
   --work "$work" \
